@@ -57,6 +57,11 @@ namespace SerialPortNotify
                 Visible = true;
                 Activate();
             };
+
+            serialNotifyIcon.BalloonTipClicked += (_sender, _e) =>
+            {
+
+            };
         }
 
         private bool IsPort(IntPtr lparam)
