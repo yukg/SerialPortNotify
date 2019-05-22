@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -76,18 +77,20 @@ namespace SerialPortNotify
             serialNotifyIcon.BalloonTipClicked += (_sender, _e) =>
             {
                 var arg = txt_clickeventpatharg.Text;
+                var exepath = txt_clickeventpath.Text;
                 var portinfo = serialNotifyIcon.Tag as PortInfo;
                 if (portinfo != null)
                 {
                     arg = arg.Replace("{PortNum}", $"{portinfo.PortNum}");
                 }
 
-                var app = new ProcessStartInfo(
-                    txt_clickeventpath.Text,
-                    arg);
-                var p = Process.Start(app);
-                p.WaitForInputIdle();
-                NativeMethods.SetForegroundCenterWindow(p.MainWindowHandle);
+                if (File.Exists(exepath))
+                {
+                    var app = new ProcessStartInfo(exepath, arg);
+                    var p = Process.Start(app);
+                    p.WaitForInputIdle();
+                    NativeMethods.SetForegroundCenterWindow(p.MainWindowHandle);
+                }
             };
         }
 
