@@ -46,8 +46,7 @@
             this.txt_clickeventpath = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.txt_clickeventpatharg = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.num_balloontiptime)).BeginInit();
             this.cms_notify.SuspendLayout();
             this.SuspendLayout();
@@ -215,29 +214,19 @@
             this.label7.TabIndex = 14;
             this.label7.Text = "Argument";
             // 
-            // textBox2
+            // txt_clickeventpatharg
             // 
-            this.textBox2.Location = new System.Drawing.Point(35, 288);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(357, 19);
-            this.textBox2.TabIndex = 15;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(398, 251);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(23, 19);
-            this.button1.TabIndex = 16;
-            this.button1.Text = "...";
-            this.button1.UseVisualStyleBackColor = true;
+            this.txt_clickeventpatharg.Location = new System.Drawing.Point(35, 288);
+            this.txt_clickeventpatharg.Name = "txt_clickeventpatharg";
+            this.txt_clickeventpatharg.Size = new System.Drawing.Size(357, 19);
+            this.txt_clickeventpatharg.TabIndex = 15;
             // 
             // mainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(433, 334);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox2);
+            this.ClientSize = new System.Drawing.Size(413, 334);
+            this.Controls.Add(this.txt_clickeventpatharg);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.txt_clickeventpath);
@@ -281,8 +270,7 @@
         private System.Windows.Forms.TextBox txt_clickeventpath;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox txt_clickeventpatharg;
     }
 }
 

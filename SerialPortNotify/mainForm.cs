@@ -30,37 +30,64 @@ namespace SerialPortNotify
                 Application.Exit();
             }
 
-           Icon = Properties.Resources.serialnotify;
+            Icon = Properties.Resources.serialnotify;
+            
+            chk_connect.Checked = Properties.Settings.Default.EnableConnectNotify;
+            chk_disconnect.Checked = Properties.Settings.Default.EnableDisconnectNotify;
+            num_balloontiptime.Value = Properties.Settings.Default.TipShowTime;
+            txt_clickeventpath.Text = Properties.Settings.Default.ClickPath;
+            txt_clickeventpatharg.Text = Properties.Settings.Default.ClickPathArg;
 
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
-            ShowInTaskbar = false;
 
             serialNotifyIcon = new NotifyIcon();
             serialNotifyIcon.Visible = true;
             serialNotifyIcon.Icon = Properties.Resources.serialnotify;
             serialNotifyIcon.ContextMenuStrip = cms_notify;
 
-            Deactivate += (_sender, _e) => Hide();
             FormClosing += (_sender, _e) =>
             {
+                Properties.Settings.Default.EnableConnectNotify = chk_connect.Checked;
+                Properties.Settings.Default.EnableDisconnectNotify = chk_disconnect.Checked;
+                Properties.Settings.Default.TipShowTime = num_balloontiptime.Value;
+                Properties.Settings.Default.ClickPath = txt_clickeventpath.Text;
+                Properties.Settings.Default.ClickPathArg = txt_clickeventpatharg.Text;
+
                 Hide();
+                ShowInTaskbar = false;
                 _e.Cancel = true;
             };
 
-            Application.ApplicationExit += (_sender, _e) 
-                => serialNotifyIcon.Dispose();
+            Application.ApplicationExit += (_sender, _e) =>
+            {
+                serialNotifyIcon.Dispose();
+                Properties.Settings.Default.Save();
+            };
 
             serialNotifyIcon.DoubleClick += (_sender, _e) =>
             {
+                ShowInTaskbar = true;
                 Visible = true;
                 Activate();
             };
 
             serialNotifyIcon.BalloonTipClicked += (_sender, _e) =>
             {
+                var arg = txt_clickeventpatharg.Text;
+                var portinfo = serialNotifyIcon.Tag as PortInfo;
+                if (portinfo != null)
+                {
+                    arg = arg.Replace("{PortNum}", $"{portinfo.PortNum}");
+                }
 
+                var app = new ProcessStartInfo(
+                    txt_clickeventpath.Text,
+                    arg);
+                var p = Process.Start(app);
+                p.WaitForInputIdle();
+                NativeMethods.SetForegroundCenterWindow(p.MainWindowHandle);
             };
         }
 
@@ -71,19 +98,27 @@ namespace SerialPortNotify
         {
             if (m.Msg == NativeMethods.WM_DEVICECHANGE)
             {
-                string portName = string.Empty;
+                PortInfo pInfo;
                 switch (m.WParam.ToInt32())
                 {
                     case NativeMethods.DBT_DEVICEARRIVAL when (chk_connect.Checked && IsPort(m.LParam)):
-                        portName = NativeMethods.GetPortName(m.LParam);
-                        serialNotifyIcon.ShowBalloonTip(
-                            (int)num_balloontiptime.Value, "Serial port device connected", portName, ToolTipIcon.Info);
+                        pInfo = new PortInfo(NativeMethods.GetPortName(m.LParam));
+
+                        serialNotifyIcon.BalloonTipIcon = ToolTipIcon.Info;
+                        serialNotifyIcon.BalloonTipTitle = "Serial port device connected";
+                        serialNotifyIcon.BalloonTipText = pInfo.PortName;
+                        serialNotifyIcon.ShowBalloonTip((int)num_balloontiptime.Value);
+                        serialNotifyIcon.Tag = pInfo;
                         break;
 
                     case NativeMethods.DBT_DEVICEREMOVECOMPLETE when (chk_disconnect.Checked && IsPort(m.LParam)):
-                        portName = NativeMethods.GetPortName(m.LParam);
-                        serialNotifyIcon.ShowBalloonTip(
-                            (int)num_balloontiptime.Value, "Serial port device disconnected", portName, ToolTipIcon.Warning);
+                        pInfo = new PortInfo(NativeMethods.GetPortName(m.LParam));
+
+                        serialNotifyIcon.BalloonTipIcon = ToolTipIcon.Warning;
+                        serialNotifyIcon.BalloonTipTitle = "Serial port device disconnected";
+                        serialNotifyIcon.BalloonTipText = pInfo.PortName;
+                        serialNotifyIcon.ShowBalloonTip((int)num_balloontiptime.Value);
+                        serialNotifyIcon.Tag = pInfo;
                         break;
 
                     default:
@@ -112,6 +147,11 @@ namespace SerialPortNotify
         private void Btn_deregistration_Click(object sender, EventArgs e)
         {
             RegistryMan.DeleteValue(RegistryMan.REG_KEYS.STARTUP, "SerialPortNotify");
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(txt_clickeventpath.Text);
         }
     }
 }

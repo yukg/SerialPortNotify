@@ -24,8 +24,15 @@ namespace SerialPortNotify
 
         static public void OpenRegistryEditor(REG_KEYS address)
         {
-            SetValue(REG_KEYS.LASTKEY, "LastKey", KeyAddress[address]);
-            Process.Start("regedit");
+            try
+            {
+                SetValue(REG_KEYS.LASTKEY, "LastKey", KeyAddress[address]);
+                Process.Start("regedit");
+            }
+            catch
+            {
+
+            }
         }
 
         static public void SetValue(REG_KEYS key, string valueName, string value)
